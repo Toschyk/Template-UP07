@@ -3,7 +3,7 @@
 
 <img width="421" height="303" alt="image" src="https://github.com/user-attachments/assets/5d5cf86f-26e4-443a-9884-1022bdc7d070" />
 
-После настройки БД создаём проект Приложение WPF (.NET Framework). Пока создаётся проект  Затем переходите в свойства, это вам пригодится потом.
+После настройки БД создаём проект Приложение WPF (.NET Framework). Пока создаётся проект переходите в свойства, это вам пригодится потом.
 
 <img width="332" height="448" alt="image" src="https://github.com/user-attachments/assets/cb3abb56-aa1a-4f73-8d41-5407276d57a7" />
 
