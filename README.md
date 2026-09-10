@@ -20,7 +20,7 @@
 Как только вы сделали страницы нужно оформить переключение между ними и также страницу регистрации и авторизации.
 Ниже будет мой пример запроса для таблицы юзеров
 
-```SQL
+```sql
 CREATE TABLE Users (
     Id            INT IDENTITY(1,1) PRIMARY KEY,
     Username      NVARCHAR(50)  NOT NULL UNIQUE,
@@ -90,4 +90,4 @@ BEGIN
     UPDATE Users SET LastLoginAt = SYSDATETIME() WHERE Id = @UserId;
 END
 GO
-```SQL
+```
