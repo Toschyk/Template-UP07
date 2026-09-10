@@ -17,4 +17,75 @@
 
 Теперь вам необходимо разработать страницы для проекта. Страницы могут быть разные в зависимости от проекта.
 
-Как только вы сделали страницы нужно оформить переключение между ними и также страницу регистрации и авторизации
+Как только вы сделали страницы нужно оформить переключение между ними и также страницу регистрации и авторизации.
+Ниже будет мой пример запроса для таблицы юзеров
+
+CREATE TABLE Users (
+    Id            INT IDENTITY(1,1) PRIMARY KEY,
+    Username      NVARCHAR(50)  NOT NULL UNIQUE,
+    Email         NVARCHAR(100) NOT NULL UNIQUE,
+    PasswordHash  NVARCHAR(256) NOT NULL,   -- Хэш пароля (SHA-256 + соль)
+    PasswordSalt  NVARCHAR(128) NOT NULL,   -- Соль для хэширования
+    FullName      NVARCHAR(100) NULL,
+    CreatedAt     DATETIME2     NOT NULL DEFAULT SYSDATETIME(),
+    LastLoginAt   DATETIME2     NULL,
+    IsActive      BIT           NOT NULL DEFAULT 1
+);
+GO
+
+
+CREATE INDEX IX_Users_Username ON Users(Username);
+CREATE INDEX IX_Users_Email ON Users(Email);
+GO
+
+
+CREATE PROCEDURE sp_RegisterUser
+    @Username     NVARCHAR(50),
+    @Email        NVARCHAR(100),
+    @PasswordHash NVARCHAR(256),
+    @PasswordSalt NVARCHAR(128),
+    @FullName     NVARCHAR(100) = NULL,
+    @NewId        INT OUTPUT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    IF EXISTS (SELECT 1 FROM Users WHERE Username = @Username)
+    BEGIN
+        RAISERROR('Пользователь с таким логином уже существует.', 16, 1);
+        RETURN;
+    END
+
+    IF EXISTS (SELECT 1 FROM Users WHERE Email = @Email)
+    BEGIN
+        RAISERROR('Пользователь с таким email уже зарегистрирован.', 16, 1);
+        RETURN;
+    END
+
+    INSERT INTO Users (Username, Email, PasswordHash, PasswordSalt, FullName)
+    VALUES (@Username, @Email, @PasswordHash, @PasswordSalt, @FullName);
+
+    SET @NewId = SCOPE_IDENTITY();
+END
+GO
+
+
+CREATE PROCEDURE sp_GetUserByUsername
+    @Username NVARCHAR(50)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT Id, Username, Email, PasswordHash, PasswordSalt, FullName, IsActive
+    FROM Users
+    WHERE Username = @Username AND IsActive = 1;
+END
+GO
+
+-- Обновление времени последнего входа
+CREATE PROCEDURE sp_UpdateLastLogin
+    @UserId INT
+AS
+BEGIN
+    UPDATE Users SET LastLoginAt = SYSDATETIME() WHERE Id = @UserId;
+END
+GO
